@@ -67,8 +67,8 @@ userController.post("/login", async (req, res) => {
           sameSite: "none",
         });
 
-        res.cookie("name", userExist.name);
-        res.cookie("role", userExist.role);
+        res.cookie("name", userExist.name, { sameSite: "none" });
+        res.cookie("role", userExist.role, { sameSite: "none" });
 
         return res.json({
           message: "login succcessful",
