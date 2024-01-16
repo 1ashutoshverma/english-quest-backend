@@ -25,11 +25,9 @@ userController.post("/signup", async (req, res) => {
       if (err) {
         return res.status(400).json({ message: "Something went wrong" });
       }
-      const parsedRole = JSON.parse(role);
-      console.log(parsedRole);
       const user = await UserModel.create({
         ...req.body,
-        role: parsedRole,
+        role: role,
         password: hash,
       });
       res.json({ message: "User signed up successfully" });
@@ -61,21 +59,6 @@ userController.post("/login", async (req, res) => {
           { role: userExist.role, userId: userExist._id },
           process.env.JWT_SECRET
         );
-        // res.cookie("token", token, {
-        //   httpOnly: true,
-        //   secure: "none",
-        //   sameSite: "none",
-        // });
-
-        // res.cookie("name", userExist.name, {
-        //   secure: "none",
-        //   sameSite: "none",
-        // });
-        // res.cookie("role", userExist.role, {
-        //   secure: "none",
-        //   sameSite: "none",
-        // });
-
         return res.json({
           message: "login succcessful",
           userData: {
