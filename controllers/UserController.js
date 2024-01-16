@@ -61,20 +61,20 @@ userController.post("/login", async (req, res) => {
           { role: userExist.role, userId: userExist._id },
           process.env.JWT_SECRET
         );
-        res.cookie("token", token, {
-          httpOnly: true,
-          secure: "none",
-          sameSite: "none",
-        });
+        // res.cookie("token", token, {
+        //   httpOnly: true,
+        //   secure: "none",
+        //   sameSite: "none",
+        // });
 
-        res.cookie("name", userExist.name, {
-          secure: "none",
-          sameSite: "none",
-        });
-        res.cookie("role", userExist.role, {
-          secure: "none",
-          sameSite: "none",
-        });
+        // res.cookie("name", userExist.name, {
+        //   secure: "none",
+        //   sameSite: "none",
+        // });
+        // res.cookie("role", userExist.role, {
+        //   secure: "none",
+        //   sameSite: "none",
+        // });
 
         return res.json({
           message: "login succcessful",
@@ -82,7 +82,6 @@ userController.post("/login", async (req, res) => {
             token: token,
             name: userExist.name,
             role: userExist.role,
-            userId: userExist._id.toString(),
           },
         });
       } else {
