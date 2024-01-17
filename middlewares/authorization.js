@@ -7,7 +7,7 @@ const authorization = (arr) => {
       return res.json({ message: "Please login first" });
     }
 
-    const token = req.headers.authorization.split("Bearer")[1];
+    const token = req.headers.authorization.split("Bearer ")[1];
 
     jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
       if (err) {
