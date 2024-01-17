@@ -11,6 +11,7 @@ bookController.get(
     try {
       const page = parseInt(req.query.page) || 1;
       const pageSize = parseInt(req.query.pageSize) || 10;
+      const roleQuery = req.query.role;
 
       let query = {};
 
@@ -51,7 +52,7 @@ bookController.get(
       }
 
       //for VIEW_ALL and VIEWER or CREATER
-      if (req.role === "CREATER" || req.role === "VIEWER") {
+      if (roleQuery === "CREATER" || roleQuery === "VIEW") {
         query.createrId = req.userId;
       }
 
