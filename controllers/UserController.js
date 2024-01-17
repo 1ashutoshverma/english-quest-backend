@@ -25,6 +25,7 @@ userController.post("/signup", async (req, res) => {
       if (err) {
         return res.status(400).json({ message: "Something went wrong" });
       }
+
       const user = await UserModel.create({
         ...req.body,
         role: role,
