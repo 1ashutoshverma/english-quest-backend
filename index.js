@@ -4,14 +4,22 @@ const { connection } = require("./configs/db");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const { userController } = require("./controllers/UserController");
-const { authorization } = require("./middlewares/authorization");
 const { bookController } = require("./controllers/BooksController");
 const morgon = require("morgan");
+const { rateLimit } = require("express-rate-limit");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  limit: 100,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+});
+
 //Middlewares
+app.use(limiter);
 app.use(morgon("tiny"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -32,13 +40,36 @@ app.get("/", (req, res) => {
 app.use("/api", userController);
 app.use("/books", bookController);
 
-app.listen(PORT, async () => {
-  try {
-    await connection;
-    console.log("DB is connected");
-  } catch (error) {
-    console.log("Error while connection to db");
-    console.log(error);
+const connectWithRetry = async (retryCount) => {
+  for (let attempt = 1; attempt <= retryCount; attempt++) {
+    try {
+      await connection;
+      console.log("DB is connected");
+      break;
+    } catch (error) {
+      console.error(
+        `Error while connecting to the database (attempt ${attempt}):`,
+        error
+      );
+      if (attempt < retryCount) {
+        console.log(`Retrying in 2 seconds...`);
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      } else {
+        console.log(
+          `Max retry attempts reached. Unable to connect to the database.`
+        );
+        process.exit(1);
+      }
+    }
   }
-  console.log("server is running");
+};
+
+app.listen(PORT, async () => {
+  const maxAttempts = 3;
+  try {
+    await connectWithRetry(maxAttempts);
+    console.log("Server is running");
+  } catch (error) {
+    console.error("Failed to start the server:", error);
+  }
 });

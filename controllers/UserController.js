@@ -25,13 +25,20 @@ userController.post("/signup", async (req, res) => {
       if (err) {
         return res.status(400).json({ message: "Something went wrong" });
       }
-
-      const user = await UserModel.create({
-        ...req.body,
-        role: role,
-        password: hash,
-      });
-      res.json({ message: "User signed up successfully" });
+      try {
+        const user = await UserModel.create({
+          ...req.body,
+          role: role,
+          password: hash,
+        });
+        res.json({ message: "User signed up successfully" });
+      } catch (error) {
+        if (error.name === "ValidationError") {
+          res.status(400).json({ error: error.message });
+        } else {
+          res.status(500).json({ error: "Internal Server Error" });
+        }
+      }
     });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
